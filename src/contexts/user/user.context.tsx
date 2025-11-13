@@ -57,21 +57,33 @@ export const UserProvider = ({ children }: reactChildrenNodeAttributes) => {
     }
   };
 
-  const checkServer = async () => {
+  const checkServer = async (retries = 3) => {
     if (serverChecked.current) return;
-    serverChecked.current = true;
-    try {
-      await fetchIt({
-        apiEndPoint: `serverstatus`,
-        httpMethod: "get",
-        isSuccessNotification: {
-          notificationText: "",
-          notificationState: false,
-        },
-      });
-      userDispatch({ type: "SET_SERVER_STATE_ON" });
-    } catch (error) {
-      userDispatch({ type: "CLEAR_SERVER_STATE_OFF" });
+    
+    for (let i = 0; i < retries; i++) {
+      try {
+        await fetchIt({
+          apiEndPoint: `serverstatus`,
+          httpMethod: "get",
+          isSuccessNotification: {
+            notificationText: "",
+            notificationState: false,
+          },
+        });
+        userDispatch({ type: "SET_SERVER_STATE_ON" });
+        serverChecked.current = true;
+        return;
+      } catch (error) {
+        console.error(`Server check attempt ${i + 1} failed:`, error);
+        if (i === retries - 1) {
+          // Final attempt failed
+          userDispatch({ type: "CLEAR_SERVER_STATE_OFF" });
+          serverChecked.current = true;
+        } else {
+          // Wait before retrying
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
     }
   };
 
