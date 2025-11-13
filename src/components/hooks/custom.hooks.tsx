@@ -141,8 +141,11 @@ export const useHttpFetcher = () => {
       timerDuration,
       contypeType,
       responseType,
+      buttonLoadingSetter,
     } = params;
     settingDispatch({ type: "SET_ISLOADING_STARTS" });
+    buttonLoadingSetter?.(true);
+    
     try {
       const res = await axiosPrivate({
         method: httpMethod,
@@ -171,9 +174,11 @@ export const useHttpFetcher = () => {
         });
       }
       settingDispatch({ type: "SET_ISLOADING_ENDS" });
+      buttonLoadingSetter?.(false);
       return res?.data as clientResponse;
     } catch (error) {
       settingDispatch({ type: "SET_ISLOADING_ENDS" });
+      buttonLoadingSetter?.(false);
       const baseNotifyPayload = {
         isURL: false,
         URL: ``,

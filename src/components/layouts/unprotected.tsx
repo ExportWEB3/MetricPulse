@@ -7,7 +7,6 @@ import { NotificationContext } from "../../contexts/notification/notification.co
 import { UserContext } from "../../contexts/user/user.context";
 import { GlobalErrorComponent } from "../../utilities/UI/globalerror.ui";
 import { ToastComponentUI } from "../../utilities/UI/toast.ui";
-import { HeaderComponent } from "../header/header";
 
 export function UnprotectedLayout(props: layoutAttributes) {
   const { children, } = props;

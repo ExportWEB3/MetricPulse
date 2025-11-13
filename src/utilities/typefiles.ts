@@ -573,6 +573,7 @@ export interface globalHTTPReqFuncAttributes {
   timerDuration?: number;
   responseType?: httpResponseTypeAttrbutes;
   contypeType?: "multipart/form-data" | "application/json";
+  buttonLoadingSetter?: (loading: boolean) => void;
 }
 export type httpResponseTypeAttrbutes =
   | "arraybuffer"

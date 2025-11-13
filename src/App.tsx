@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { lazy } from "react";
 import { DashboardProvider } from "./contexts/dashboard/dashboard.context";
+import { UserProvider } from "./contexts/user/user.context";
 
 // Lazy-loaded pages
 const LandingPage = lazy(
@@ -17,14 +18,16 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <DashboardProvider>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<LoginPage />} />
-            <Route path="/:mode/dashboard" element={<DashboardPage />} />
-          </Routes>
-        </DashboardProvider>
+        <UserProvider>
+          <DashboardProvider>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<LoginPage />} />
+              <Route path="/:mode/dashboard" element={<DashboardPage />} />
+            </Routes>
+          </DashboardProvider>
+        </UserProvider>
       </BrowserRouter>
     </>
   );

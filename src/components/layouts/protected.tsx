@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import { settingContext } from "../../contexts/settings/settings.context";
 import { UserContext } from "../../contexts/user/user.context";
 import { NotificationContext } from "../../contexts/notification/notification.context";
 import { CheckServerStatus } from "../error/error.component";
