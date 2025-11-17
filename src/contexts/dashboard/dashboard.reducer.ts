@@ -22,6 +22,12 @@ export const DashboardReducer = (
         error: null,
       };
 
+    case "SET_INSIGHTS":
+      return {
+        ...dashboardState,
+        insights: action.payload,
+      };
+
     case "SET_LOADING":
       return {
         ...dashboardState,
@@ -51,6 +57,7 @@ export const DashboardReducer = (
       return {
         mode: "real",
         metrics: null,
+        insights: null,
         isLoading: false,
         error: null,
         csvUploadProgress: 0,

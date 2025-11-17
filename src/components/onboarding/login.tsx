@@ -132,7 +132,7 @@ export function LoginComponent () {
                     />
                     <hr className="flex-1" />
                 </div>
-                <FormUIComponent className="w-full" onSubmit={handleSubmit}>
+                <FormUIComponent className="w-full space-y-3!" onSubmit={handleSubmit}>
                     {loginData.map((login, ind) => (
                     <div key={ind} className="w-full">
                         <InputUIComponent

@@ -6,6 +6,9 @@ import { generateMetricCards } from "../../../utilities/metricCards";
 import { ChartsDashboard } from "./charts.dashboard";
 import { AnalyticsComponent } from "./ai.analytics.dashboard";
 import { ButtonUIComponent } from "../../../utilities/UI/button.ui";
+import { RefreshInsightsButton } from "./refresh-insights.button";
+import { DeleteMetricsButton } from "./delete-metrics.button";
+import { nonMetricPages } from "../../../utilities/data";
 
 
 
@@ -59,7 +62,7 @@ export function DashboardComponent() {
   if (error) {
     return (
       <section className="w-full h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4 p-8 bg-red-50 border border-red-200 rounded-lg max-w-md">
+        <div className="flex flex-col justify-center items-center gap-4 border border-slate-700 rounded-lg w-100 h-50">
           <TextUIComponent
             type="h5"
             text="Error Loading Dashboard"
@@ -68,14 +71,13 @@ export function DashboardComponent() {
           <TextUIComponent
             type="p"
             text={error}
-            className="text-red-500 text-center"
+            className="text-red-500! text-center"
           />
-          <button
+          <ButtonUIComponent
             onClick={clearError}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition"
-          >
-            Dismiss
-          </button>
+            className="w-40 h-10 bg-red-600 hover:bg-red-700 text-white rounded-md transition"
+            text="Dismiss"
+          />
         </div>
       </section>
     );
@@ -83,24 +85,60 @@ export function DashboardComponent() {
 
   if (!metrics) {
     return (
-      <section className="w-full h-screen flex items-center justify-center ">
-        <TextUIComponent
-          type="p"
-          text="No data available"
-          className="text-gray-600"
-        />
+      <section className="w-full h-screen flex items-center justify-center p-2!">
+        <div className="flex flex-col items-center justify-center gap-8 max-w-md">
+          {/* Icon */}
+          <div className="w-24 h-24 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+
+          {/* Title */}
+          <TitleUIComponent
+            type="h4"
+            text="No Data Available Yet"
+            className="text-white text-center"
+          />
+
+          {/* Description */}
+          <TextUIComponent
+            type="p"
+            text="Start by uploading a CSV file with your metrics data to see your dashboard come to life with insights and analytics."
+            className="text-gray-400! text-center"
+          />
+
+          {/* Steps */}
+          <div className="w-full space-y-4!">
+            {nonMetricPages.map((page) => (
+              <div className="flex gap-4 p-2! rounded-lg bg-slate-800/50 border border-slate-700">
+              <div className="shrink-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">{page.id}</div>
+              <div>
+                <TextUIComponent type="p" text={page.label} className="text-white!" />
+                <TextUIComponent type="p" text={page.desc} className="text-gray-400!" />
+              </div>
+            </div>
+            ))}
+          </div>
+
+          {/* Additional Help Text */}
+          <TextUIComponent
+            type="p"
+            text="💡 Tip: Use the Navigation Bar menu to upload your first CSV file"
+            className="text-blue-400! text-center"
+          />
+        </div>
       </section>
     );
   }
 
   return (
-    <section className="w-full flex flex-col lg:flex-row gap-4 p-4 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 px-4!">
+    <section className="w-full flex flex-col lg:flex-row gap-4 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 px-4!">
      {/* <aside className="w-full lg:w-64 shrink-0">
          <SidebarComponent mode={mode as "demo" | "real"} /> 
       </aside> */}
 
       <main className="flex-1">
-        {/* Dashboard Header - DEMO MODE */}
         {mode === "demo" && (
           <div className="h-18 flex items-center border-b border-slate-700">
             <div className="w-full flex flex-col md:flex-row justify-center md:items-center md:justify-between">
@@ -124,13 +162,6 @@ export function DashboardComponent() {
                 />
               )}
             </div>
-          </div>
-        )}
-
-        {/* Dashboard Header - REAL MODE */}
-        {mode !== "demo" && (
-          <div className="mb-6! pb-6! border-b border-gray-200">
-            {/* Custom header for real mode - Style as needed */}
           </div>
         )}
 
@@ -179,19 +210,13 @@ export function DashboardComponent() {
           </div>
         </div>
 
-        <ChartsDashboard />
+        <ChartsDashboard metricsData={metrics} />
 
        <AnalyticsComponent />
 
+       <RefreshInsightsButton />
 
-        {/* Gemini API CTA */}
-       <div className="w-full h-20 flex mt-5! items-center border-t border-slate-700">
-  <ButtonUIComponent 
-  type="button"
-  text="Refresh AI Insights"
-  className="w-full bg-blue-700 hover:bg-blue-500 text-white text-sm font-medium py-2! rounded-lg transition-all duration-200"  
-  />
-</div>
+       <DeleteMetricsButton />
       </main>
     </section>
   );

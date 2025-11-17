@@ -1,7 +1,10 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 import { DashboardProvider } from "./contexts/dashboard/dashboard.context";
 import { UserProvider } from "./contexts/user/user.context";
+import { NotificationProvider } from "./contexts/notification/notification.context";
+import { SuspenseFallback } from "./components/suspense/SuspenseFallback";
+import { ToastComponentUI } from "./utilities/UI/toast.ui";
 
 // Lazy-loaded pages
 const LandingPage = lazy(
@@ -19,14 +22,21 @@ function App() {
     <>
       <BrowserRouter>
         <UserProvider>
-          <DashboardProvider>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<LoginPage />} />
-              <Route path="/:mode/dashboard" element={<DashboardPage />} />
-            </Routes>
-          </DashboardProvider>
+          <NotificationProvider>
+            {/* Global Toast - renders anywhere in the app */}
+            <ToastComponentUI />
+            
+            <DashboardProvider>
+              <Suspense fallback={<SuspenseFallback />}>
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/signup" element={<LoginPage />} />
+                  <Route path="/:mode/dashboard" element={<DashboardPage />} />
+                </Routes>
+              </Suspense>
+            </DashboardProvider>
+          </NotificationProvider>
         </UserProvider>
       </BrowserRouter>
     </>
@@ -34,3 +44,4 @@ function App() {
 }
 
 export default App;
+

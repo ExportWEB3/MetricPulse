@@ -9,6 +9,7 @@ import type {
 export const initialDashboardState: DashboardInitialStateAttributes = {
   mode: "real", // "demo" or "real"
   metrics: null,
+  insights: null,
   isLoading: false,
   error: null,
   csvUploadProgress: 0,

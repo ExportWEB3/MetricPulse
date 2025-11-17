@@ -1,13 +1,13 @@
 import { useContext, useEffect } from "react";
 import { UserContext } from "../../contexts/user/user.context";
-import { axiosBase } from "../../utilities/baseURL";
+import { axiosPrivate } from "../../utilities/baseURL";
 import { refreshFunc } from "../../utilities/helperfunction";
 
 const useAxiosPrivate = () => {
   const { userDispatch: dispatch, userState: state } = useContext(UserContext);
 
   useEffect(() => {
-    const responseIntercept = axiosBase.interceptors.response.use(
+    const responseIntercept = axiosPrivate.interceptors.response.use(
       (response) => response,
       async (error) => {
         const prevRequest = error?.config;
@@ -24,7 +24,7 @@ const useAxiosPrivate = () => {
             });
             prevRequest.headers["authorization"] = `Bearer ${response?.token}`;
 
-            return axiosBase(prevRequest);
+            return axiosPrivate(prevRequest);
           } catch (error) {
             dispatch({
               type: "LOG_OUT",
@@ -37,11 +37,11 @@ const useAxiosPrivate = () => {
     );
 
     return () => {
-      axiosBase.interceptors.response.eject(responseIntercept);
+      axiosPrivate.interceptors.response.eject(responseIntercept);
     };
   }, [state?.token]);
 
-  return axiosBase;
+  return axiosPrivate;
 };
 
 export default useAxiosPrivate;

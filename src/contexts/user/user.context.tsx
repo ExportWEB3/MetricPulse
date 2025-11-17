@@ -13,7 +13,7 @@ import { useServerCheck } from "../../components/hooks/useServerCheck.hooks";
 const initialUserState: UserInitialStateAttributes = {
   user: null,
   token: "",
-  isServerAlive: false,
+  isServerAlive: null, // null means checking, don't show error yet
   isRefreshTokenResponseState: "",
   globalError: { errorState: false, errorMessage: "" },
 };
