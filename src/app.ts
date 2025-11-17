@@ -16,7 +16,7 @@ app.use(
   cors({
     origin: process.env.NODE_ENV === 'production' 
       ? sanitizedConfig.FRONTEND_URL 
-      : ['http://localhost:3000', 'http://127.0.0.1:3000', "https://1c9e65e8119d.ngrok-free.app"],
+      : ['http://localhost:3000', 'http://127.0.0.1:3000', ""],
     credentials: true
   })
 );

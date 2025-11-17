@@ -128,7 +128,7 @@ export const login = async (req: any, res: Response, next: NextFunction): Promis
       message: 'Login successful',
       payload: {
         token: accessToken,
-        user: {
+       user: {
           _id: user._id,
           email: user.email
         }
@@ -210,6 +210,27 @@ export const refreshAccessToken = async (
 // Logout handler
 export const logout = async (req: any, res: Response, next: NextFunction): Promise<void> => {
   try {
+    const userId = req.userId; // From auth middleware
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+
+    if (!userId) {
+      res.status(401).json({ error: 'Not authenticated' });
+      return;
+    }
+
+    // Find user and add token to revoked list
+    if (token) {
+      const user = await User.findById(userId).select('+revokedTokens');
+      if (user) {
+        // Add current token to revoked tokens
+        if (!user.revokedTokens) {
+          user.revokedTokens = [];
+        }
+        user.revokedTokens.push(token);
+        await user.save();
+      }
+    }
+
     // Clear the refresh token cookie
     res.clearCookie('refreshToken', {
       httpOnly: true,
@@ -224,3 +245,4 @@ export const logout = async (req: any, res: Response, next: NextFunction): Promi
     next(error);
   }
 };
+

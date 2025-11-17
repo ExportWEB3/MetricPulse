@@ -44,7 +44,7 @@ Respond ONLY with this JSON structure (no markdown, no explanation):
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${sanitizedConfig.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${sanitizedConfig.GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -58,7 +58,17 @@ Respond ONLY with this JSON structure (no markdown, no explanation):
       }
     );
 
-    const data = await response.json();
+    const data = await response.json() as any;
+    
+    // Log the response for debugging
+    console.log('Gemini API Response:', JSON.stringify(data, null, 2));
+    
+    // Check if response has candidates
+    if (!data.candidates || !data.candidates[0]) {
+      console.error('Invalid Gemini API response structure:', data);
+      throw new Error(`Gemini API error: ${data.error?.message || 'Invalid response structure'}`);
+    }
+    
     const text = (data as any).candidates[0].content.parts[0].text;
 
     // Remove markdown code blocks if present

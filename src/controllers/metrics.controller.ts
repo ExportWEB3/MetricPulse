@@ -11,10 +11,15 @@ const upload = multer({ storage: multer.memoryStorage() });
 export const getMetrics = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const metrics = await Metric.find({ userId: req.userId }).sort({ date: 1 }).lean();
+    const insights = await Insight.findOne({ userId: req.userId }).lean();
 
     res.json({
-      metrics,
-      count: metrics.length
+      message: 'Metrics retrieved successfully',
+      count: metrics.length,
+      payload: {
+        metrics,
+        insights: insights?.insights || []
+      }
     });
   } catch (error: any) {
     console.error('Get metrics error:', error);
@@ -74,7 +79,10 @@ export const uploadMetrics = async (req: AuthRequest, res: Response, next: NextF
     res.json({
       message: 'Metrics uploaded successfully',
       count: savedMetrics.length,
-      insights: insights.insights
+      payload: {
+        metrics: savedMetrics,
+        insights: insights.insights
+      }
     });
   } catch (error: any) {
     console.error('Upload error:', error);

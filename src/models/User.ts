@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IUserModel extends Document {
   email: string;
   password: string;
+  revokedTokens: string[]; // Store revoked token JTIs or hashes
   createdAt: Date;
 }
 
@@ -21,6 +22,11 @@ const UserSchema: Schema = new Schema({
     minlength: 6,
     select: false // Don't return password by default
   },
+  revokedTokens: {
+    type: [String],
+    default: [],
+    select: false // Don't return by default for performance
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -28,3 +34,4 @@ const UserSchema: Schema = new Schema({
 });
 
 export const User = mongoose.model<IUserModel>('User', UserSchema);
+
