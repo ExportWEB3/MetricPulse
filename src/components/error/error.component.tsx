@@ -49,34 +49,36 @@ export function ComponentErrorDisplayer(props: {
 }
 
 export function CheckServerStatus() {
-  // Temporarily disable the server-down overlay so frontend work can continue
-  // without the backend. Restore the JSX below when the backend is available.
-  /*
   return (
     <>
-      <div className="w-full h-screen fixed  flex justify-center items-center overflow-hidden bg-gray-200  px-4">
-        <div className="w-full sm:w-7/12 md:w-6/12 lg:w-5/12 xl:w-3/12 bg-white rounded-md shadow-lg !p-6 h-56 justify-center flex flex-col items-center text-center">
+      <div className="w-full h-screen fixed inset-0 flex justify-center items-center overflow-hidden bg-gray-900 bg-opacity-80 px-4! z-50">
+        <div className="w-full sm:w-7/12 md:w-6/12 lg:w-5/12 xl:w-3/12 bg-white rounded-lg shadow-2xl p-8! min-h-64 justify-center flex flex-col items-center space-y-3! text-center">
           <IconUIComponent
             icon="ri-error-warning-line"
-            className="text-primary-lighter text-6xl"
+            className="text-red-500 text-6xl mb-4"
           />
 
           <TitleUIComponent
-            text="Server is down at the moment!"
+            text="Server is Down"
             type="h5"
-            className="text-primary-light !mt-6"
+            className="text-gray-800! mt-6! font-bold!"
           />
 
           <TextUIComponent
             type="p"
-            text="Check back later and refresh the browser"
-            className="text-primary-lighter mt-3"
+            text="The backend server is currently unavailable. Please check back later and refresh your browser."
+            className="text-gray-600! mt-4 text-sm leading-relaxed"
           />
+
+          <div className="">
+            <ButtonUIComponent 
+              text="Refresh Page" 
+              className="hover:bg-gray-500"
+              onClick={() => window.location.reload()}
+            />
+          </div>
         </div>
       </div>
     </>
   );
-  */
-
-  return null;
 }

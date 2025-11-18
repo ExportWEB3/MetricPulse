@@ -1,3 +1,4 @@
+import { useContext, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { loginData } from "../../utilities/data";
 import { ButtonUIComponent } from "../../utilities/UI/button.ui";
@@ -6,11 +7,17 @@ import OptimizedImage from "../../utilities/UI/image.ui";
 import { InputUIComponent } from "../../utilities/UI/input.ui";
 import { TextUIComponent, TitleUIComponent } from "../../utilities/UI/texts.ui";
 import { IconUIComponent } from "../../utilities/UI/icon.ui";
+import { UserContext } from "../../contexts/user/user.context";
+import { useHttpFetcher } from "../hooks/custom.hooks";
 
 
 export function LoginComponent () {
-    const navigate =  useNavigate();
+    const navigate = useNavigate();
     const location = useLocation();
+    const { userDispatch } = useContext(UserContext);
+    const { fetchIt } = useHttpFetcher();
+    const [buttonLoading, setButtonLoading] = useState(false);
+    const [formData, setFormData] = useState({ email: "", password: "" });
     const isSignup = location.pathname.includes("/signup");
 
     const buttonText = isSignup ? "Create an account" : "Login";
@@ -29,6 +36,59 @@ export function LoginComponent () {
 
     const handleDemoMode = () => {
         navigate("/demo/dashboard");
+    };
+
+    const handleInputChange = (data: any) => {
+        setFormData(prev => ({
+            ...prev,
+            [data.name]: data.value
+        }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setButtonLoading(true);
+
+        try {
+            // Validate inputs
+            if (!formData.email || !formData.password) {
+                setButtonLoading(false);
+                return;
+            }
+
+            // Determine endpoint based on current URL
+            const apiEndPoint = isSignup ? "register" : "login";
+            
+            // Make API call using fetchIt
+            const res = await fetchIt({
+                apiEndPoint,
+                reqData: formData,
+                httpMethod: 'post',
+                isSuccessNotification: {
+                    notificationState: true,
+                    notificationText: isSignup ? "Account created successfully!" : "Login successful!"
+                },
+                buttonLoadingSetter: setButtonLoading,
+            }) as any;
+
+            // Check if response has payload (success)
+            if (res?.payload) {
+                const payloadUser = res.payload?.user;
+                const payloadToken = res.payload?.token;
+                
+                // Store token and user info
+                userDispatch({ type: "SET_USER", payload: payloadUser });
+                userDispatch({ type: "SET_TOKEN", payload: payloadToken });
+
+                // Redirect immediately to dashboard
+                navigate("/user/dashboard");
+            }
+
+        } catch (error: any) {
+            console.error('Login error:', error);
+        } finally {
+            setButtonLoading(false);
+        }
     };
 
     return (
@@ -72,7 +132,7 @@ export function LoginComponent () {
                     />
                     <hr className="flex-1" />
                 </div>
-                <FormUIComponent className="w-full" onSubmit={() => {}}>
+                <FormUIComponent className="w-full space-y-3!" onSubmit={handleSubmit}>
                     {loginData.map((login, ind) => (
                     <div key={ind} className="w-full">
                         <InputUIComponent
@@ -80,16 +140,19 @@ export function LoginComponent () {
                         label={login.label}
                         name={login.label.toLowerCase()}
                         placeholder={login.placeholder}
+                        value={formData[login.label.toLowerCase() as keyof typeof formData]}
+                        onChange={handleInputChange}
                          />
                     </div>
                 ))}
+                    <ButtonUIComponent 
+                    type="submit"
+                    className="bg-slate-700 hover:bg-slate-600 w-full"
+                    text={buttonLoading ? "Loading..." : buttonText}
+                    isBorder={false}
+                    isDisable={buttonLoading}
+                    />
                 </FormUIComponent>
-                <ButtonUIComponent 
-                type="submit"
-                className="bg-slate-700 hover:bg-slate-600 w-full"
-                text={buttonText}
-                isBorder={false}
-                />
                 <span className="flex gap-2">
 <TextUIComponent 
     type="p"

@@ -7,13 +7,13 @@ import type {
     UserContextAttributes, 
     UserInitialStateAttributes 
 } from "../../utilities/typefiles";
-import { useHttpFetcher } from "../../components/hooks/custom.hooks";
 import { refreshFunc } from "../../utilities/helperfunction";
+import { useServerCheck } from "../../components/hooks/useServerCheck.hooks";
 
 const initialUserState: UserInitialStateAttributes = {
   user: null,
   token: "",
-  isServerAlive: false,
+  isServerAlive: null, // null means checking, don't show error yet
   isRefreshTokenResponseState: "",
   globalError: { errorState: false, errorMessage: "" },
 };
@@ -26,7 +26,7 @@ export const UserContext = createContext<UserContextAttributes>({
 export const UserProvider = ({ children }: reactChildrenNodeAttributes) => {
   const [userState, userDispatch] = useReducer(UserReducer, initialUserState);
   const serverChecked = useRef(false);
-  const { fetchIt } = useHttpFetcher();
+  const { checkServerStatus } = useServerCheck();
 
   const refreshSWR = async () => {
     try {
@@ -60,24 +60,28 @@ export const UserProvider = ({ children }: reactChildrenNodeAttributes) => {
   const checkServer = async () => {
     if (serverChecked.current) return;
     serverChecked.current = true;
-    try {
-      await fetchIt({
-        apiEndPoint: `serverstatus`,
-        httpMethod: "get",
-        isSuccessNotification: {
-          notificationText: "",
-          notificationState: false,
-        },
-      });
+    
+    console.log('[UserContext] Starting server check...');
+    const isServerAlive = await checkServerStatus(3);
+    
+    if (isServerAlive) {
+      console.log('[UserContext] Server is alive');
       userDispatch({ type: "SET_SERVER_STATE_ON" });
-    } catch (error) {
+    } else {
+      console.log('[UserContext] Server is down');
       userDispatch({ type: "CLEAR_SERVER_STATE_OFF" });
     }
   };
 
   useEffect(() => {
-    refreshSWR();
-    checkServer();
+    // Give the page a moment to load before checking server
+    const timer = setTimeout(() => {
+      console.log('[UserContext] Initializing checks...');
+      refreshSWR();
+      checkServer();
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   return (

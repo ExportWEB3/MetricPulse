@@ -117,7 +117,7 @@ export interface reactChildrenNodeAttributes {
 export interface UserInitialStateAttributes {
   user: userAttributes | null;
   token: string;
-  isServerAlive: boolean;
+  isServerAlive: boolean | null; // null = checking, true = alive, false = dead
   isRefreshTokenResponseState: string;
   globalError: { errorState: boolean; errorMessage: string };
 }
@@ -573,6 +573,7 @@ export interface globalHTTPReqFuncAttributes {
   timerDuration?: number;
   responseType?: httpResponseTypeAttrbutes;
   contypeType?: "multipart/form-data" | "application/json";
+  buttonLoadingSetter?: (loading: boolean) => void;
 }
 export type httpResponseTypeAttrbutes =
   | "arraybuffer"
@@ -1701,6 +1702,7 @@ export interface MetricDataAttributes {
 export interface DashboardInitialStateAttributes {
   mode: DashboardModeAttributes;
   metrics: MetricDataAttributes | null;
+  insights: any | null;
   isLoading: boolean;
   error: string | null;
   csvUploadProgress: number;
@@ -1714,7 +1716,7 @@ export type DashboardActionAttributes =
     }
   | {
       type: "SET_METRICS";
-      payload: MetricDataAttributes;
+      payload: MetricDataAttributes | null;
     }
   | {
       type: "SET_LOADING";
@@ -1730,6 +1732,10 @@ export type DashboardActionAttributes =
   | {
       type: "SET_CSV_UPLOAD_PROGRESS";
       payload: number;
+    }
+  | {
+      type: "SET_INSIGHTS";
+      payload: any;
     }
   | {
       type: "RESET_DASHBOARD";

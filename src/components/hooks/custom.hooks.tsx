@@ -141,43 +141,64 @@ export const useHttpFetcher = () => {
       timerDuration,
       contypeType,
       responseType,
+      buttonLoadingSetter,
     } = params;
     settingDispatch({ type: "SET_ISLOADING_STARTS" });
+    buttonLoadingSetter?.(true);
+    
     try {
-      const res = await axiosPrivate({
+      // Check if reqData is FormData (for file uploads)
+      const isFormData = reqData instanceof FormData;
+      
+      const config: any = {
         method: httpMethod,
         url: `/${apiEndPoint}`,
         data: reqData,
         withCredentials: true,
         responseType: responseType,
-        headers: {
-          "Content-Type": contypeType ? contypeType : "application/json",
-          authorization: `Bearer ${tokenRef.current}`,
-        },
-      });
+      };
 
-      if (isSuccessNotification?.notificationState && httpMethod !== "get") {
-        notify({
-          notificationText:
-            isSuccessNotification?.notificationText || "Success",
-          isURL: isSuccessNotification?.isURL || false,
-          URL: isSuccessNotification?.URL || "",
-          isTimer: isSuccessNotification?.isTimer || true,
-          timer: timerDuration ? timerDuration : "3000",
-          bgColour: isSuccessNotification?.bgColour,
-          isNavigation: isSuccessNotification?.isNavigation || true,
-          isRevalidate: isSuccessNotification?.isRevalidate || false,
-          isRevaliddateURL: isSuccessNotification?.isRevaliddateURL,
-        });
+      // Set headers
+      config.headers = {
+        authorization: `Bearer ${tokenRef.current}`,
+      };
+      
+      // Only set Content-Type for non-FormData requests
+      if (!isFormData && contypeType !== "multipart/form-data") {
+        config.headers["Content-Type"] = contypeType ? contypeType : "application/json";
       }
+
+      const res = await axiosPrivate(config);
+
+      // Always show response message as toast (globally)
+      const successMessage = 
+        res?.data?.message || 
+        isSuccessNotification?.notificationText || 
+        "Success";
+      
+      notify({
+        notificationText: successMessage,
+        isURL: isSuccessNotification?.isURL || false,
+        URL: isSuccessNotification?.URL || "",
+        isTimer: isSuccessNotification?.isTimer !== false,
+        timer: timerDuration ? timerDuration : "3000",
+        bgColour: isSuccessNotification?.bgColour,
+        isNavigation: isSuccessNotification?.isNavigation || false,
+        isRevalidate: isSuccessNotification?.isRevalidate || false,
+        isRevaliddateURL: isSuccessNotification?.isRevaliddateURL,
+        notificationState: true,
+      });
+      
       settingDispatch({ type: "SET_ISLOADING_ENDS" });
+      buttonLoadingSetter?.(false);
       return res?.data as clientResponse;
     } catch (error) {
       settingDispatch({ type: "SET_ISLOADING_ENDS" });
+      buttonLoadingSetter?.(false);
       const baseNotifyPayload = {
         isURL: false,
         URL: ``,
-        isTimer: false,
+        isTimer: true,
         isNavigation: false,
         timer: timerDuration ?? "3000",
         isRevalidate: isSuccessNotification?.isRevalidate,
@@ -188,31 +209,29 @@ export const useHttpFetcher = () => {
         const message =
           typeof error?.response?.data?.message === "string"
             ? error?.response?.data?.message
-            : "Something went wrong, refresh browser or contact support";
+            : typeof error?.response?.data?.error === "string"
+            ? error?.response?.data?.error
+            : error?.message || "Something went wrong, refresh browser or contact support";
+
+        // Always show error toast globally
+        notify({
+          ...baseNotifyPayload,
+          notificationText: message,
+        });
 
         if (error?.response?.status === 429) {
           dispatch({ type: "LOG_OUT" });
           dispatch({ type: "SET_REFRESH_TOKEN_RESPONSE", payload: "429" });
-          notify({
-            ...baseNotifyPayload,
-            notificationText: message,
-          });
-          throw error;
         }
-        if (httpMethod !== "get") {
-          notify({
-            ...baseNotifyPayload,
-            notificationText: message,
-          });
-          throw error;
-        } else throw error;
-      } else if (httpMethod !== "get") {
+        throw error;
+      } else {
+        // Show generic error toast
         notify({
           ...baseNotifyPayload,
-          notificationText: "something went wrongd",
+          notificationText: "Something went wrong. Please try again.",
         });
         throw error;
-      } else throw error;
+      }
     }
   };
 
@@ -393,5 +412,60 @@ export function useMediaQuery(query: string): boolean {
     };
   }, [query]);
 
+
   return matches;
 }
+
+export const useLogout = () => {
+  const navigate = useNavigate();
+  const { userDispatch } = useContext(UserContext);
+  const { fetchIt } = useHttpFetcher();
+  const { notify } = useNotificationHook();
+
+  const handleLogout = async () => {
+    try {
+      // Call logout endpoint to clear refresh token on backend
+      await fetchIt({
+        apiEndPoint: "logout",
+        httpMethod: 'post',
+        reqData: {},
+        isSuccessNotification: {
+          notificationState: false,
+          notificationText: ""
+        },
+      });
+
+      // Show success notification
+      notify({
+        notificationText: "Logged out successfully!",
+        isURL: false,
+        URL: "",
+        isTimer: true,
+        timer: "2000",
+        bgColour: "bg-green-500",
+        isNavigation: true,
+        isRevalidate: false,
+        notificationState: true,
+        icon: "ri-logout-box-line"
+      });
+
+      // Clear user state from context (this clears token and user)
+      userDispatch({ type: "LOG_OUT" });
+
+      // Redirect to login page after a short delay
+      setTimeout(() => {
+        navigate("/login");
+      }, 2100);
+    } catch (error: any) {
+      console.error('Logout error:', error);
+      // Even if the API call fails, clear the local state
+      userDispatch({ type: "LOG_OUT" });
+      navigate("/login");
+    }
+  };
+
+  return { handleLogout };
+};
+
+
+
