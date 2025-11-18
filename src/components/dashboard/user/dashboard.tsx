@@ -214,9 +214,13 @@ export function DashboardComponent() {
 
        <AnalyticsComponent />
 
-       <RefreshInsightsButton />
+       {mode !== "demo" && (
+        <div className="w-full flex flex-col">
+          <RefreshInsightsButton />
 
        <DeleteMetricsButton />
+        </div>
+       )}
       </main>
     </section>
   );
