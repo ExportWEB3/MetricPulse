@@ -14,10 +14,8 @@ const startServer = async () => {
       console.log(` Environment: ${sanitizedConfig.NODE_ENV}`);
       console.log(` Frontend URL: ${sanitizedConfig.FRONTEND_URL}`);
       
-      // Start server ping cron job to keep Render free tier alive
-      if (sanitizedConfig.NODE_ENV === 'production') {
-        startServerPingCron();
-      }
+      // Start server ping cron job (for production on Render, also test in dev)
+      startServerPingCron();
     });
   } catch (error: any) {
     console.error(' Error starting server:', error.message);
