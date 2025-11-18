@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
-import { BarChart3, TrendingUp, Upload, Sparkles, Check, ArrowRight, Users, DollarSign, AlertCircle, LineChart, Github, Twitter } from 'lucide-react';
+import { BarChart3, TrendingUp, Upload, Sparkles, ArrowRight, Users, DollarSign, AlertCircle, LineChart, Github, Twitter } from 'lucide-react';
 
 export function LandingComponent() {
-  const [email, setEmail] = useState('');
 
   const handleGetStarted = () => {
     window.location.href = '/signup';
@@ -224,7 +222,7 @@ export function LandingComponent() {
 
       {/* CTA Section */}
       <section className="max-w-6xl! mx-auto! px-6! py-16!">
-        <div className="bg-gradient-to-r! from-blue-600! to-blue-700! rounded-xl! p-8! md:p-12! text-center!">
+        <div className="bg-linear-to-r! from-blue-600! to-blue-700! rounded-xl! p-8! md:p-12! text-center!">
           <h2 className="text-3xl! md:text-4xl! font-bold! mb-4!">Ready to understand your metrics?</h2>
           <p className="text-blue-100! text-lg! mb-8! max-w-2xl! mx-auto!">
             Join founders who are making data-driven decisions with MetricPulse
