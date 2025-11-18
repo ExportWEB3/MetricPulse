@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: metricpulse-backend
+    env: node
+    buildCommand: npm install; npm run build
+    startCommand: npm start
+    memoryMB: 512
