@@ -16,7 +16,7 @@ app.use(
   cors({
     origin: process.env.NODE_ENV === 'production' 
       ? sanitizedConfig.FRONTEND_URL 
-      : ['http://localhost:3000', 'http://127.0.0.1:3000', ""],
+      : ['http://localhost:3000', 'http://127.0.0.1:3000', "https://metric-0x-pulse.vercel.app/"],
     credentials: true
   })
 );

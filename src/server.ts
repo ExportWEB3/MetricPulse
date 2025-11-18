@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import app from './app.js';
 import sanitizedConfig from './config/env.js';
+import { startServerPingCron } from './utilities/cron.js';
 
 // MongoDB Connection
 const startServer = async () => {
@@ -12,6 +13,11 @@ const startServer = async () => {
       console.log(` Server running on port ${sanitizedConfig.PORT}`);
       console.log(` Environment: ${sanitizedConfig.NODE_ENV}`);
       console.log(` Frontend URL: ${sanitizedConfig.FRONTEND_URL}`);
+      
+      // Start server ping cron job to keep Render free tier alive
+      if (sanitizedConfig.NODE_ENV === 'production') {
+        startServerPingCron();
+      }
     });
   } catch (error: any) {
     console.error(' Error starting server:', error.message);
