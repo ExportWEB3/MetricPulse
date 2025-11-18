@@ -1,6 +1,6 @@
 
 
-import { LandingPageComponent } from "../../components/landingpage/landingPage";
+import { LandingComponent } from "../../components/landingpage/landing-page-new";
 import { UnprotectedLayout } from "../../components/layouts/unprotected";
 
 export default function LandingPage() {
@@ -10,7 +10,7 @@ export default function LandingPage() {
         title="Landing Page"
         description="MIT Subscription platform"
       >
-        <LandingPageComponent />
+        <LandingComponent />
       </UnprotectedLayout>
     </>
   );
