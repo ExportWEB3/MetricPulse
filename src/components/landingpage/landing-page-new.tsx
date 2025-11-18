@@ -258,7 +258,7 @@ export function LandingComponent() {
             <p className="text-slate-500! text-sm!">© 2024 MetricPulse. Built for founders who ship fast.</p>
             <div className="flex! items-center! gap-4!">
               <a href="#" className="text-slate-400! hover:text-white! transition-colors!">
-                <Twitter className="w-5! h-5!" />
+                <Twitter className="w-5! h-5!" onClick={()=>{}} />
               </a>
               <a href="#" className="text-slate-400! hover:text-white! transition-colors!">
                 <Github className="w-5! h-5!" />
