@@ -32,6 +32,7 @@ export interface IInsight {
 
 export interface AuthRequest extends Request {
   userId?: string;
+  file?: Express.Multer.File;
 }
 
 export interface ParsedMetric extends IMetric {
